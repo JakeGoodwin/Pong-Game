@@ -7,10 +7,7 @@ import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
-import com.almasb.fxgl.physics.BoundingShape;
 import com.almasb.fxgl.physics.CollisionHandler;
-import com.almasb.fxgl.physics.HitBox;
-
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -19,7 +16,6 @@ import javafx.scene.text.Font;
 
 import java.util.Map;
 import java.util.Random;
-
 
 /*
  * ----------------PONG----------------
@@ -32,7 +28,7 @@ import java.util.Random;
  * V.2 - Working Entities with Colour --COMPLETE--
  * V.3 - Basic ball movement and 'Physics' --COMPLETE--
  * V.4 - Working Single Player --COMPLETE--
- * V.5 - Working Multiplayer
+ * V.5 - Working Multiplayer --COMPLETE--
  * V.6 - Functioning Main Menu for Single/Multiplayer
  * V.7 - Single player game difficulty 
  * V.8 - Working Textures and Sound
@@ -43,38 +39,34 @@ import java.util.Random;
 
 public class App extends GameApplication {
 
-	//Entities used for checking collision
+	// Entities used for checking collision
 	public enum EntityType {
 		PADDLE, BALL, WALL
 	}
 
 	private Entity player, NPCPlayer, background, topBar, bottomBar, ball;
 	Random random = new Random();
-	
+	Boolean multiplayer = true;
+
 	int ballY = -5;
-	int ballX = random.nextInt(6 - 4 + 1) + 4; //Ball has slight change in speed each round.
+	int ballX = random.nextInt(6 - 4 + 1) + 4; // Ball has slight change in speed each round.
 
 	@Override
 	protected void initSettings(GameSettings settings) {
 		settings.setWidth(1200);
 		settings.setHeight(800);
 		settings.setTitle("Pong");
-		settings.setVersion("0.4"); 
+		settings.setVersion("0.5");
 		settings.setFullScreenAllowed(true);
 
 	}
-	
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}
 
-	
-	
-	
-	
 	@Override
-	//Initialise Entities and their values
+	// Initialise Entities and their values
 	protected void initGame() {
 
 		background = Entities.builder().at(0, 0)
@@ -104,10 +96,10 @@ public class App extends GameApplication {
 	}
 
 	@Override
-	//Initialise and handle user Input
+	// Initialise and handle user Input
 	protected void initInput() {
 		Input input = getInput();
-		input.addAction(new UserAction("Move Up") {
+		input.addAction(new UserAction("Move Up P1") {
 			@Override
 			protected void onAction() {
 				if (player.getY() > 75) {
@@ -116,7 +108,7 @@ public class App extends GameApplication {
 			}
 		}, KeyCode.UP);
 
-		input.addAction(new UserAction("Move Down") {
+		input.addAction(new UserAction("Move Down P1") {
 			@Override
 			protected void onAction() {
 				if (player.getY() < getSettings().getHeight() - 150) {
@@ -125,13 +117,33 @@ public class App extends GameApplication {
 			}
 		}, KeyCode.DOWN);
 
+		if (multiplayer) {
+			input.addAction(new UserAction("Move Up P2") {
+				@Override
+				protected void onAction() {
+					if (NPCPlayer.getY() > 75) {
+						NPCPlayer.translateY(-4);
+					}
+				}
+			}, KeyCode.W);
+
+			input.addAction(new UserAction("Move Down P2") {
+				@Override
+				protected void onAction() {
+					if (NPCPlayer.getY() < getSettings().getHeight() - 150) {
+						NPCPlayer.translateY(4);
+					}
+				}
+			}, KeyCode.S);
+
+		}
 	}
 
 	@Override
-	//Initialise User Interface - The scoreboard
+	// Initialise User Interface - The scoreboard
 	protected void initUI() {
-		
-		//Pong Title
+
+		// Pong Title
 		Text title = new Text();
 		title.setTranslateX(getSettings().getWidth() / 2 - 90);
 		title.setTranslateY(40);
@@ -139,10 +151,8 @@ public class App extends GameApplication {
 		title.setFill(Color.WHITE);
 		title.setText("P O N G");
 		getGameScene().addUINode(title);
-		
-		
-		
-		//Score for Player
+
+		// Score for Player
 		Text scorePlayer = new Text();
 		scorePlayer.setTranslateX(100);
 		scorePlayer.setTranslateY(40);
@@ -151,7 +161,7 @@ public class App extends GameApplication {
 		getGameScene().addUINode(scorePlayer);
 		scorePlayer.textProperty().bind(getGameState().intProperty("scorePlayer").asString());
 
-		//Score for NPC (or Player 2 when implemented)
+		// Score for NPC (or Player 2 when implemented)
 		Text scoreComputer = new Text();
 		scoreComputer.setTranslateX(getSettings().getWidth() - 125);
 		scoreComputer.setTranslateY(40);
@@ -162,14 +172,14 @@ public class App extends GameApplication {
 	}
 
 	@Override
-	//Scoreboards
+	// Scoreboards
 	protected void initGameVars(Map<String, Object> vars) {
 		vars.put("scorePlayer", 0);
 		vars.put("scoreComputer", 0);
 	}
 
 	@Override
-	//Check for collision between objects and make the ball react
+	// Check for collision between objects and make the ball react
 	protected void initPhysics() {
 		getPhysicsWorld().addCollisionHandler(new CollisionHandler(EntityType.PADDLE, EntityType.BALL) {
 
@@ -201,11 +211,11 @@ public class App extends GameApplication {
 	}
 
 	@Override
-	//The game loop
+	// The game loop
 	protected void onUpdate(double tpf) {
 
-			// If there is a goal, reset positions and increase points.
-			//Goal Player 1
+		// If there is a goal, reset positions and increase points.
+		// Goal Player 1
 		if (ball.getX() > getSettings().getWidth()) {
 			getGameState().increment("scorePlayer", +1);
 
@@ -227,8 +237,10 @@ public class App extends GameApplication {
 			if (direction)
 				ballX = -ballX;
 
-			//Goal Player 2
-		} else if (ball.getX() < 0) {
+			// Goal Player 2
+		}
+
+		if (ball.getX() < 0) {
 			getGameState().increment("scoreComputer", +1);
 
 			ball.setX(getSettings().getWidth() / 2);
@@ -251,18 +263,22 @@ public class App extends GameApplication {
 
 		}
 
-		//Control the movement of the NPC Player - Moves paddle to the middle whilst waiting for ball return
-		if (NPCPlayer.getY() < ball.getY() && NPCPlayer.getY() < getSettings().getHeight() - 150 && ballX > 0) {
-			NPCPlayer.translateY(4.5);
-		} else if (NPCPlayer.getY() > ball.getY() && ballX > 0) {
-			NPCPlayer.translateY(-4.5);
-		} else if (NPCPlayer.getY() > 400 && ballX < 0) {
-			NPCPlayer.translateY(-4.5);
-		} else if (NPCPlayer.getY() < 400 && ballX < 0) {
-			NPCPlayer.translateY(4.5);
+		if (!multiplayer) {
+
+			// Control the movement of the NPC Player - Moves paddle to the middle whilst
+			// waiting for ball return
+			if (NPCPlayer.getY() < ball.getY() && NPCPlayer.getY() < getSettings().getHeight() - 150 && ballX > 0) {
+				NPCPlayer.translateY(4.5);
+			} else if (NPCPlayer.getY() > ball.getY() && ballX > 0) {
+				NPCPlayer.translateY(-4.5);
+			} else if (NPCPlayer.getY() > 400 && ballX < 0) {
+				NPCPlayer.translateY(-4.5);
+			} else if (NPCPlayer.getY() < 400 && ballX < 0) {
+				NPCPlayer.translateY(4.5);
+			}
 		}
 
-		//Move ball each frame
+		// Move ball each frame
 		ball.translateX(ballX);
 		ball.translateY(ballY);
 
