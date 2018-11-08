@@ -46,7 +46,7 @@ public class App extends GameApplication {
 
 	private Entity player, NPCPlayer, background, topBar, bottomBar, ball;
 	Random random = new Random();
-	Boolean multiplayer = true;
+	Boolean multiplayer = false;
 
 	int ballY = -5;
 	int ballX = random.nextInt(6 - 4 + 1) + 4; // Ball has slight change in speed each round.
@@ -227,15 +227,8 @@ public class App extends GameApplication {
 			NPCPlayer.setY(400);
 
 			Random random = new Random();
-			Boolean direction;
-			if (ballX > 0) {
-				direction = true;
-			} else {
-				direction = false;
-			}
-			int ballX = random.nextInt(6 - 4 + 1) + 4;
-			if (direction)
-				ballX = -ballX;
+			ballX = (random.nextInt(6 - 4 + 1) + 4) * -1;
+			
 
 			// Goal Player 2
 		}
@@ -251,15 +244,8 @@ public class App extends GameApplication {
 			NPCPlayer.setY(400);
 
 			Random random = new Random();
-			Boolean direction;
-			if (ballX > 0) {
-				direction = true;
-			} else {
-				direction = false;
-			}
-			int ballX = random.nextInt(6 - 4 + 1) + 4;
-			if (direction)
-				ballX = -ballX;
+			ballX = random.nextInt(6 - 4 + 1) + 4;
+	
 
 		}
 
