@@ -8,6 +8,12 @@ import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
 import com.almasb.fxgl.physics.CollisionHandler;
+import com.almasb.fxgl.scene.FXGLMenu;
+import com.almasb.fxgl.scene.menu.MenuType;
+
+import javafx.beans.binding.StringBinding;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -60,7 +66,9 @@ public class App extends GameApplication {
 		settings.setFullScreenAllowed(true);
 
 	}
-
+	
+	
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -269,5 +277,54 @@ public class App extends GameApplication {
 		ball.translateY(ballY);
 
 	}
+	
+	
+	
+	//TODO: MENU
+		public class MyMenu extends FXGLMenu {
+		    public MyMenu (GameApplication app, MenuType type) {
+		        super(app, type);
+
+		        // code to customize the view of your menu
+		    }
+
+			@Override
+			protected Button createActionButton(String name, Runnable action) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			protected Button createActionButton(StringBinding name, Runnable action) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			protected Node createBackground(double width, double height) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			protected Node createTitleView(String title) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			protected Node createVersionView(String version) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			protected Node createProfileView(String profileName) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		}
+
+	
 
 }
